@@ -180,16 +180,20 @@ function makeBusinesses(rng: Rng): Business[] {
 
 function makeEvents(rng: Rng, users: User[], businesses: Business[]): LotivityEvent[] {
   const categories: EventCategory[] = ['social', 'sports', 'volunteer', 'paid', 'work'];
+  // Templates repeat across 44 events; identical adjacent titles read as a bug.
+  const usedTitles = new Set<string>();
 
   return Array.from({ length: VOLUMES.events }, (_, i) => {
     const hood = rng.pick(NEIGHBORHOODS);
     const interest = rng.pick(INTERESTS);
     const venue = rng.pick(businesses);
     const templates = EVENT_TITLE_TEMPLATES[interest.id] ?? ['{neighborhood} meetup'];
-    const title = rng
+    const baseTitle = rng
       .pick(templates)
       .replace('{neighborhood}', hood.name)
       .replace('{place}', venue.name);
+    const title = usedTitles.has(baseTitle) ? `${baseTitle} — ${hood.name}` : baseTitle;
+    usedTitles.add(title);
 
     // Roughly a third in the past so recaps and 7-day windows have material.
     const dayOffset = i % 3 === 0 ? rng.int(-13, -1) : rng.int(0, 21);

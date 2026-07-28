@@ -29,6 +29,12 @@ export interface ScoreContext {
   networkIds?: string[];
   /** Event ids already shown, used for the recency penalty. */
   seenEventIds?: string[];
+  /**
+   * Factors to leave out entirely. Guests have no network and no stated
+   * generation, so scoring on either would invent a claim the card then
+   * repeats back to them.
+   */
+  suppressFactors?: FactorId[];
   heritageLabel?: (id: string) => string;
   cultureLabel?: (id: string) => string;
   interestLabel?: (id: string) => string;
@@ -62,9 +68,10 @@ export function scoreEvent(event: LotivityEvent, ctx: ScoreContext): ScoredEvent
   const labelCulture = ctx.cultureLabel ?? identity;
   const labelInterest = ctx.interestLabel ?? identity;
 
+  const suppressed = new Set(ctx.suppressFactors ?? []);
   const factors: Factor[] = [];
   const add = (id: FactorId, value: number, reason: string) => {
-    if (value === 0) return;
+    if (value === 0 || suppressed.has(id)) return;
     factors.push({ id, value, contribution: value * WEIGHTS[id], reason });
   };
 

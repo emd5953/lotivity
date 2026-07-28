@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 import { useAppStore } from './store';
 
 const TABS = [
@@ -11,21 +11,14 @@ const TABS = [
 ];
 
 export function AppShell() {
-  const { hydrated, profile, hydrate } = useAppStore();
-  const navigate = useNavigate();
-  const location = useLocation();
-
+  const { hydrated, hydrate } = useAppStore();
   useEffect(() => {
     if (!hydrated) void hydrate();
   }, [hydrated, hydrate]);
 
-  // Anyone without a profile belongs in onboarding, not a half-empty feed.
-  useEffect(() => {
-    if (hydrated && !profile && !location.pathname.startsWith('/welcome')) {
-      navigate('/welcome', { replace: true });
-    }
-  }, [hydrated, profile, location.pathname, navigate]);
-
+  // No login wall. Without a profile you browse in guest mode (PRD §9.3) —
+  // requiring signup to see whether anything is happening nearby is the
+  // fastest way to lose someone in a city we just launched in.
   if (!hydrated) {
     return (
       <div className="app-frame flex items-center justify-center">

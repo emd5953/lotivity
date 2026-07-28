@@ -81,6 +81,11 @@ describe('fixture generation', () => {
     }
   });
 
+  it('gives every event a distinct title', () => {
+    const titles = getWorld().events.map((e) => e.title);
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
   it('starts events on the hour or half hour', () => {
     for (const event of getWorld().events) {
       expect([0, 30]).toContain(new Date(event.startsAt).getUTCMinutes());

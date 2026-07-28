@@ -38,6 +38,28 @@ async function completeOnboarding(page: Page) {
   await page.waitForURL('**/for-you', { timeout: 10_000 });
 }
 
+test('the app opens straight into content, with no login wall', async ({ page }) => {
+  await page.goto('/');
+
+  // Must land on the feed itself, not be bounced to onboarding.
+  await page.waitForURL('**/for-you');
+  await expect(page.getByRole('heading', { name: 'Around you' })).toBeVisible();
+  await expect(page.getByText(/browsing as a guest/)).toBeVisible();
+  await expect(page.getByRole('listitem').first()).toBeVisible();
+
+  // Every tab is reachable without a profile.
+  await page.getByRole('link', { name: 'Map' }).click();
+  await page.waitForURL('**/map');
+  await expect(page.getByText(/within \d+ mi/)).toBeVisible();
+
+  await page.getByRole('link', { name: 'Profile' }).click();
+  await expect(page.getByText('Nothing saved yet')).toBeVisible();
+
+  // And signing up is still one tap away.
+  await page.getByRole('button', { name: 'Set up your profile' }).click();
+  await page.waitForURL('**/welcome');
+});
+
 test('onboarding lands on a personalized For You feed', async ({ page }) => {
   await completeOnboarding(page);
 

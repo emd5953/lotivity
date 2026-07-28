@@ -127,6 +127,23 @@ describe('scoreEvent — reasons', () => {
     expect(topFactors[0]?.reason).toBe('Because you follow Music');
   });
 
+  it('omits suppressed factors from both the score and the reasons', () => {
+    // Guest mode: no network, no declared generation.
+    const event = makeEvent({
+      location: CENTER,
+      generationTags: ['millennial'],
+      attendeeIds: ['user:a'],
+    });
+    const ctx = baseCtx({
+      networkIds: ['user:a'],
+      suppressFactors: ['generationMatch', 'networkAttendance'],
+    });
+
+    const { score, factors } = scoreEvent(event, ctx);
+    expect(factors.map((f) => f.id)).toEqual(['proximity']);
+    expect(score).toBeCloseTo(WEIGHTS.proximity, 5);
+  });
+
   it('never surfaces the recency penalty as a reason', () => {
     const { topFactors } = scoreEvent(
       makeEvent({ generationTags: ['millennial'] }),

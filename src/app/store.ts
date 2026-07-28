@@ -30,6 +30,26 @@ export const emptyDraft = (): OnboardingDraft => ({
   interestSubcategories: [],
 });
 
+/**
+ * The identity used before anyone signs up. Ranking still works — with no
+ * interests or heritage to match, the feed falls back to proximity, which is
+ * exactly the "here's what's actually near you" pitch (PRD §9.3).
+ */
+export const guestProfile = (location: GeoPoint = DEFAULT_CENTER): User => ({
+  id: 'user:guest',
+  name: 'Guest',
+  dob: '',
+  generation: 'millennial',
+  accountType: 'adult',
+  heritage: [],
+  languages: ['English'],
+  cultureTags: [],
+  interests: [],
+  interestSubcategories: [],
+  location,
+  isGuest: true,
+});
+
 interface AppState {
   hydrated: boolean;
   profile: User | null;

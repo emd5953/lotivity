@@ -25,7 +25,24 @@ export function ProfileScreen() {
   const { profile, resetDemo } = useAppStore();
   const navigate = useNavigate();
 
-  if (!profile) return null;
+  // Guests reach this tab too — it's the pitch for signing up, not a dead end.
+  if (!profile) {
+    return (
+      <>
+        <ScreenHeader title="Profile" subtitle="Browsing as a guest" />
+        <Card className="space-y-3">
+          <p className="font-medium">Nothing saved yet</p>
+          <p className="text-sm leading-relaxed text-muted">
+            Guests can browse everything nearby. Setting up a profile is what gets you matched
+            on heritage, faith, and interests — and lets you attend, review, and connect.
+          </p>
+          <Button full onClick={() => navigate('/welcome')}>
+            Set up your profile
+          </Button>
+        </Card>
+      </>
+    );
+  }
 
   const accountType = ACCOUNT_TYPES.find((t) => t.id === profile.accountType);
   const faiths = profile.cultureTags.filter(isFaith).map(cultureLabel);

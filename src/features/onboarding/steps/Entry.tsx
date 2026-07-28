@@ -10,7 +10,7 @@ export function Entry() {
   const navigate = useNavigate();
   const updateDraft = useAppStore((s) => s.updateDraft);
 
-  const start = (authMethod: 'google' | 'apple' | 'guest') => {
+  const start = (authMethod: 'google' | 'apple') => {
     updateDraft({ authMethod, step: 1 });
     navigate('/welcome/name');
   };
@@ -39,8 +39,9 @@ export function Entry() {
         <Button full variant="secondary" onClick={() => start('apple')}>
           Continue with Apple
         </Button>
-        <Button full variant="ghost" onClick={() => start('guest')}>
-          Look around as a guest
+        {/* Straight into the app — no profile, no wall (PRD §9.3). */}
+        <Button full variant="ghost" onClick={() => navigate('/for-you')}>
+          Look around first
         </Button>
         <p className="pt-1 text-center text-xs text-muted">
           Guests can browse everything nearby. Attending, reviewing, and connecting need a profile.

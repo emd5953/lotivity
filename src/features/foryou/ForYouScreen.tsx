@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAppStore } from '@/app/store';
+import { guestProfile, useAppStore } from '@/app/store';
 import { getBusinesses, getUpcomingEvents, getWorld } from '@/data/repo';
 import type { Business } from '@/data/schema';
 import { HERITAGE_BY_ID, heritageLabel } from '@/data/reference/heritage';
 import { cultureLabel } from '@/data/reference/culture';
 import { interestLabel } from '@/data/reference/interests';
 import { rankEvents, type ScoredEvent } from '@/lib/recommend';
-import { EmptyState, Pill, ScreenHeader } from '@/ui';
+import { Card, EmptyState, Pill, ScreenHeader } from '@/ui';
 import { generationLabel } from '@/lib/generation';
 import { EventCard } from './EventCard';
 import { HeritageNotice } from './HeritageNotice';
@@ -25,12 +25,19 @@ interface HeritagePick {
 }
 
 export function ForYouScreen() {
-  const profile = useAppStore((s) => s.profile);
+  const savedProfile = useAppStore((s) => s.profile);
+  const location = useAppStore((s) => s.location);
+  const isGuest = savedProfile === null;
+  // Guests see the real feed, ranked by what's actually close (PRD §9.3).
+  const profile = useMemo(
+    () => savedProfile ?? guestProfile(location),
+    [savedProfile, location],
+  );
+
   const [ranked, setRanked] = useState<ScoredEvent[] | null>(null);
   const [heritagePick, setHeritagePick] = useState<HeritagePick | null>(null);
 
   useEffect(() => {
-    if (!profile) return;
     let cancelled = false;
 
     void (async () => {
@@ -47,7 +54,10 @@ export function ForYouScreen() {
       const scored = rankEvents(events, {
         user: profile,
         now,
-        networkIds,
+        networkIds: isGuest ? [] : networkIds,
+        // A guest has no network and no declared generation — scoring on
+        // either would put a claim on the card that isn't true.
+        suppressFactors: isGuest ? ['generationMatch', 'networkAttendance'] : [],
         heritageLabel,
         cultureLabel,
         interestLabel,
@@ -81,17 +91,37 @@ export function ForYouScreen() {
     return () => {
       cancelled = true;
     };
-  }, [profile]);
-
-  if (!profile) return null;
+  }, [profile, isGuest]);
 
   return (
     <>
       <ScreenHeader
-        title={`Hey, ${profile.name.split(' ')[0]}`}
-        subtitle="What's worth leaving the house for this week."
-        trailing={<Pill tone="brand">{generationLabel(profile.generation)}</Pill>}
+        title={isGuest ? 'Around you' : `Hey, ${profile.name.split(' ')[0]}`}
+        subtitle={
+          isGuest
+            ? "What's happening near you this week."
+            : "What's worth leaving the house for this week."
+        }
+        trailing={
+          isGuest ? null : <Pill tone="brand">{generationLabel(profile.generation)}</Pill>
+        }
       />
+
+      {isGuest ? (
+        <Card className="mb-4 space-y-2 border-brand/30 bg-brand-soft/50">
+          <p className="font-medium">You&rsquo;re browsing as a guest</p>
+          <p className="text-sm leading-relaxed text-muted">
+            This is sorted by what&rsquo;s closest. Tell us what you&rsquo;re into and it gets
+            sorted by what&rsquo;s actually for you.
+          </p>
+          <Link
+            to="/welcome"
+            className="inline-block text-sm font-medium text-brand underline underline-offset-4"
+          >
+            Set up your profile →
+          </Link>
+        </Card>
+      ) : null}
 
       {ranked === null ? (
         <p className="py-10 text-center text-muted">Finding things near you…</p>
