@@ -16,26 +16,31 @@ export function EventCard({ scored }: { scored: ScoredEvent }) {
     <Card as="li" className="space-y-3">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">
+          <p className="eyebrow">
             {dayFormatter.format(starts)} · {timeFormatter.format(starts)}
           </p>
-          <h3 className="mt-1 text-[1.05rem] font-semibold leading-snug">{event.title}</h3>
-          <p className="mt-1 text-sm text-muted">
-            {event.neighborhood} · {distanceMi.toFixed(1)} mi
+          <h3 className="mt-1.5 text-[1.0625rem] font-semibold leading-snug tracking-card text-cream">
+            {event.title}
+          </h3>
+          <p className="mt-1 text-sm text-cream/45">
+            {event.neighborhood} ·{' '}
+            <span className="font-mono tabular-nums">{distanceMi.toFixed(1)} mi</span>
           </p>
         </div>
-        {event.sponsoredBy ? <Pill tone="accent">Sponsored</Pill> : null}
+        {/* A sponsor is informational — it is not the user's own aliveness. */}
+        {event.sponsoredBy ? <Pill tone="info">Sponsored</Pill> : null}
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {event.priceLabel ? <Pill>{event.priceLabel}</Pill> : <Pill tone="brand">Free</Pill>}
+        {event.priceLabel ? <Pill>{event.priceLabel}</Pill> : <Pill tone="accent">Free</Pill>}
         <Pill>{event.attendeeIds.length} going</Pill>
         {event.requiresGuardian ? <Pill tone="warn">Guardian required</Pill> : null}
       </div>
 
-      {/* FR-FEED-3 — the card explains itself. */}
+      {/* FR-FEED-3 — the card explains itself. Separated by a luminance step
+          rather than a rule (DESIGN_SPEC §1.4). */}
       {topFactors.length > 0 ? (
-        <p className="border-t border-line pt-3 text-sm text-muted">
+        <p className="-mx-4 -mb-4 rounded-b-card bg-cream/2.2 px-4 py-3 text-sm text-cream/45">
           {topFactors.map((f) => f.reason).join(' · ')}
         </p>
       ) : null}

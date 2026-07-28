@@ -14,7 +14,7 @@ const MapScreen = lazy(() =>
 );
 
 const MapFallback = (
-  <div className="flex h-[60vh] items-center justify-center text-muted">Loading map…</div>
+  <div className="eyebrow flex h-[60vh] items-center justify-center">Loading map…</div>
 );
 
 export const router = createBrowserRouter([

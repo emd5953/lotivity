@@ -32,23 +32,25 @@ export function AccountTypeStep() {
         </BubbleGroup>
 
         {active ? (
-          <p className="text-[0.95rem] text-muted" aria-live="polite">
+          <p className="text-[0.95rem] leading-relaxed text-cream/60" aria-live="polite">
             {active.blurb}
           </p>
         ) : null}
 
         {/* FR-PROF-5 — the incentive is stated plainly rather than buried. */}
-        <div className="rounded-card border border-line bg-surface p-4">
-          <p className="text-sm leading-relaxed text-muted">
+        <div className="surface-card p-4">
+          <p className="text-sm leading-relaxed text-cream/45">
             Community promotions are matched to these categories. Picking the one that actually
             reflects your life is what gets you the discounts and gatherings meant for you.
           </p>
         </div>
 
         {selected === 'youth' ? (
-          <div className="rounded-card border border-accent/30 bg-accent/10 p-4">
-            <p className="text-sm font-medium">Youth accounts need a verified adult</p>
-            <p className="mt-1 text-sm leading-relaxed text-muted">
+          <div className="rounded-card bg-accent/10 p-4 ring-1 ring-inset ring-accent/30">
+            <p className="font-display font-semibold tracking-card text-cream">
+              Youth accounts need a verified adult
+            </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-cream/60">
               Any event you host or attend needs a community-appointed host or parent who has
               verified their ID. We&rsquo;ll walk you through it after setup.
             </p>

@@ -8,8 +8,9 @@ import { DEFAULT_CENTER, DEFAULT_CENTER_LABEL, isWithinNyc } from '@/data/refere
 import { boundsForRadius } from '@/lib/geo';
 import { Bubble, BubbleGroup, Button, Sheet } from '@/ui';
 
-/** No API key required — swap this one constant for Mapbox later. */
-const BASEMAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+/** No API key required — swap this one constant for Mapbox later. Dark, because
+ *  there is no light mode and a bright basemap would be the only lit object. */
+const BASEMAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 
 const FILTERS: { id: MapFilter; label: string }[] = [
   { id: 'events', label: 'Events' },
@@ -20,11 +21,16 @@ const FILTERS: { id: MapFilter; label: string }[] = [
 
 const RADII = [0.5, 1, 2, 5, 10];
 
+/**
+ * The categorical palette (DESIGN_SPEC §1.5) — muted so a dense map still
+ * reads as Lotivity. Olive is absent on purpose: it means "alive", not
+ * "category". No orange, ever.
+ */
 const PIN_COLORS: Record<MapFilter, string> = {
-  events: '#0d5c4a',
-  clubs: '#4a5cb8',
-  workshops: '#8a4ab8',
-  food: '#e8a33d',
+  events: '#7E8F5A', // moss
+  clubs: '#8892A0', // slate
+  workshops: '#9B7FA6', // plum
+  food: '#C9B08A', // sand
 };
 
 export function MapScreen() {
@@ -114,7 +120,9 @@ export function MapScreen() {
       const el = document.createElement('button');
       el.type = 'button';
       el.setAttribute('aria-label', item.title);
-      el.style.cssText = `width:14px;height:14px;border-radius:999px;border:2px solid #fff;cursor:pointer;background:${PIN_COLORS[item.filter]};box-shadow:0 1px 4px rgba(0,0,0,.3)`;
+      // An ink ring, not a white one — pins separate from each other by a
+      // luminance step, the same as everything else in the system.
+      el.style.cssText = `width:14px;height:14px;border-radius:999px;border:2px solid #0A0A0A;cursor:pointer;background:${PIN_COLORS[item.filter]};box-shadow:0 1px 6px rgba(0,0,0,.6)`;
       el.addEventListener('click', () => setSelected(item));
 
       markersRef.current.push(
@@ -147,22 +155,24 @@ export function MapScreen() {
 
   return (
     <div className="pt-6">
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Around you</h1>
-        <p className="text-sm text-muted" aria-live="polite">
+      <div className="flex items-baseline justify-between gap-3">
+        <h1 className="text-[1.875rem] font-semibold leading-none tracking-display text-cream">
+          Around you
+        </h1>
+        <p className="chip-label shrink-0 text-cream/45 tabular-nums" aria-live="polite">
           {items.length} within {radiusMi} mi
         </p>
       </div>
-      <p className="mt-1 text-sm text-muted">
+      <p className="mt-2.5 text-sm text-cream/45">
         {geoDenied ? `Showing ${DEFAULT_CENTER_LABEL}` : locationLabel}
       </p>
 
       <div
         ref={containerRef}
-        className="relative mt-4 h-[46vh] w-full overflow-hidden rounded-card border border-line bg-canvas"
+        className="relative mt-4 h-[46vh] w-full overflow-hidden rounded-card bg-soft ring-1 ring-inset ring-cream/7"
       >
         {tilesFailed ? (
-          <p className="absolute inset-x-0 top-3 z-10 text-center text-xs text-muted">
+          <p className="eyebrow absolute inset-x-0 top-3 z-10 text-center">
             Offline — showing pins without the basemap
           </p>
         ) : null}
@@ -186,7 +196,7 @@ export function MapScreen() {
         </BubbleGroup>
 
         <div>
-          <label htmlFor="radius" className="mb-2 block text-sm font-medium text-muted">
+          <label htmlFor="radius" className="eyebrow mb-2.5 block tabular-nums">
             Radius — {radiusMi} mi
           </label>
           <input
@@ -197,9 +207,9 @@ export function MapScreen() {
             step={1}
             value={RADII.indexOf(radiusMi)}
             onChange={(e) => setRadiusMi(RADII[Number(e.target.value)] ?? 2)}
-            className="w-full accent-brand"
+            className="w-full accent-accent"
           />
-          <div className="flex justify-between text-xs text-muted">
+          <div className="flex justify-between font-mono text-[0.65rem] tabular-nums text-cream/30">
             {RADII.map((r) => (
               <span key={r}>{r}</span>
             ))}
@@ -214,7 +224,7 @@ export function MapScreen() {
         />
 
         {geoDenied ? (
-          <p className="rounded-card border border-line bg-surface p-3 text-sm text-muted">
+          <p className="surface-card p-4 text-sm leading-relaxed text-cream/45">
             We couldn&rsquo;t use your location, so you&rsquo;re seeing {DEFAULT_CENTER_LABEL}.
             Everything still works — drag the map to look around.
           </p>
@@ -232,12 +242,14 @@ export function MapScreen() {
       <Sheet open={Boolean(selected)} onClose={() => setSelected(null)} title={selected?.title ?? ''}>
         {selected ? (
           <>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">
-              {selected.kind}
+            <p className="eyebrow">{selected.kind}</p>
+            <h2 className="mt-1.5 text-xl font-semibold tracking-title text-cream">
+              {selected.title}
+            </h2>
+            <p className="mt-1 text-sm text-cream/45">{selected.subtitle}</p>
+            <p className="mt-3 font-mono text-sm tabular-nums text-cream/60">
+              {selected.distanceMi.toFixed(1)} mi away
             </p>
-            <h2 className="mt-1 text-lg font-semibold">{selected.title}</h2>
-            <p className="mt-1 text-sm text-muted">{selected.subtitle}</p>
-            <p className="mt-3 text-sm">{selected.distanceMi.toFixed(1)} mi away</p>
           </>
         ) : null}
       </Sheet>

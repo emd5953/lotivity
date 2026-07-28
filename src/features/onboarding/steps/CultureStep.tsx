@@ -48,7 +48,7 @@ export function CultureStep() {
           ))}
         </BubbleGroup>
 
-        <p className="text-sm leading-relaxed text-muted">
+        <p className="text-sm leading-relaxed text-cream/45">
           We never verify or share these as facts about you. They only steer what we show you.
         </p>
       </div>

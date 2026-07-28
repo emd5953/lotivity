@@ -39,15 +39,17 @@ export function StepFrame({
   return (
     <div className="flex flex-1 flex-col">
       <div className="pt-8">
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {subtitle ? <p className="mt-2 text-[0.95rem] text-muted">{subtitle}</p> : null}
+        <h1 className="text-[1.875rem] font-semibold leading-[1.05] tracking-display text-cream">
+          {title}
+        </h1>
+        {subtitle ? <p className="mt-3 text-[0.95rem] text-cream/45">{subtitle}</p> : null}
       </div>
 
       <div className="flex-1 py-7">{children}</div>
 
-      <div className="sticky bottom-0 space-y-3 bg-canvas pb-2 pt-3">
+      <div className="sticky bottom-0 space-y-3 bg-bg pb-2 pt-3">
         {blockedHint && !canContinue ? (
-          <p className="text-center text-sm text-muted" aria-live="polite">
+          <p className="eyebrow text-center" aria-live="polite">
             {blockedHint}
           </p>
         ) : null}

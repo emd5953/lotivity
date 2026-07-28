@@ -103,20 +103,22 @@ export function ForYouScreen() {
             : "What's worth leaving the house for this week."
         }
         trailing={
-          isGuest ? null : <Pill tone="brand">{generationLabel(profile.generation)}</Pill>
+          isGuest ? null : <Pill tone="accent">{generationLabel(profile.generation)}</Pill>
         }
       />
 
       {isGuest ? (
-        <Card className="mb-4 space-y-2 border-brand/30 bg-brand-soft/50">
-          <p className="font-medium">You&rsquo;re browsing as a guest</p>
-          <p className="text-sm leading-relaxed text-muted">
+        <Card className="mb-4 space-y-2">
+          <p className="font-display font-semibold tracking-card text-cream">
+            You&rsquo;re browsing as a guest
+          </p>
+          <p className="text-sm leading-relaxed text-cream/45">
             This is sorted by what&rsquo;s closest. Tell us what you&rsquo;re into and it gets
             sorted by what&rsquo;s actually for you.
           </p>
           <Link
             to="/welcome"
-            className="inline-block text-sm font-medium text-brand underline underline-offset-4"
+            className="inline-block text-sm font-medium text-accent underline underline-offset-4 hover:text-accent-hi"
           >
             Set up your profile →
           </Link>
@@ -124,7 +126,7 @@ export function ForYouScreen() {
       ) : null}
 
       {ranked === null ? (
-        <p className="py-10 text-center text-muted">Finding things near you…</p>
+        <p className="eyebrow py-10 text-center">Finding things near you…</p>
       ) : ranked.length === 0 ? (
         <EmptyState
           title="Nothing nearby yet"
@@ -145,7 +147,10 @@ export function ForYouScreen() {
       )}
 
       <div className="pt-6 text-center">
-        <Link to="/work" className="text-sm font-medium text-brand underline underline-offset-4">
+        <Link
+          to="/work"
+          className="text-sm font-medium text-accent underline underline-offset-4 hover:text-accent-hi"
+        >
           Looking for something with your team? →
         </Link>
       </div>

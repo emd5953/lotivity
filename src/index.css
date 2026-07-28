@@ -4,30 +4,74 @@
 
 @layer base {
   :root {
-    /* Warm paper canvas, deep green brand — reads as "local/civic", not "tech". */
-    --c-canvas: 250 247 242;
-    --c-surface: 255 255 255;
-    --c-ink: 26 32 30;
-    --c-muted: 106 118 114;
-    --c-line: 226 220 210;
-    --c-brand: 13 92 74;
-    --c-brand-soft: 226 240 235;
-    --c-accent: 232 163 61;
-    --c-warn: 176 62 42;
+    /* Cinema black, one olive accent. The palette lives here and nowhere
+       else — a full re-hue is a change to this block (DESIGN_SPEC §9). */
+    --c-bg: 0 0 0;
+    --c-soft: 14 14 14;
+    --c-raised: 25 25 24;
+    --c-raised2: 35 35 34;
+
+    --c-cream: 241 236 229;
+    --c-ink: 10 10 10;
+
+    --c-accent: 168 193 82;
+    --c-accent-hi: 190 213 111;
+    --c-accent-lo: 143 168 71;
+
+    --c-teal: 123 154 171;
+    --c-error: 220 38 38;
+    --c-success: 22 163 74;
+
+    /* Categorical encoding only (map pins, club categories). No orange. */
+    --c-sand: 201 176 138;
+    --c-plum: 155 127 166;
+    --c-slate: 136 146 160;
+    --c-moss: 126 143 90;
+    --c-clay: 166 118 107;
   }
 
   html {
     -webkit-text-size-adjust: 100%;
+    color-scheme: dark;
   }
 
   body {
-    @apply bg-canvas text-ink font-sans antialiased;
+    @apply bg-bg text-cream/85 font-sans antialiased;
     overscroll-behavior-y: none;
+  }
+
+  /* Film grain, one atmosphere for the whole app. Without it a pure-black
+     UI reads as a dead panel rather than as a dark room (DESIGN_SPEC §6). */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 48;
+    pointer-events: none;
+    opacity: 0.045;
+    mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    @apply bg-accent text-ink;
   }
 
   /* Visible focus everywhere — the bubble UI is keyboard-heavy (NFR-6). */
   :focus-visible {
-    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-canvas;
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-bg;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+
+  input,
+  select,
+  textarea {
+    color-scheme: dark;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -44,10 +88,66 @@
 
 @layer components {
   .app-frame {
-    @apply mx-auto w-full max-w-app min-h-dvh bg-canvas;
+    @apply mx-auto w-full max-w-app min-h-dvh bg-bg;
   }
 
   .screen-pad {
     @apply px-5;
   }
+
+  /* Mono, lowercase, positively letterspaced. The single biggest tell of
+     the system — applied with text-transform so the real string survives
+     for assistive tech and tests (DESIGN_SPEC §2.3). */
+  .eyebrow {
+    @apply font-mono text-[0.6875rem] font-medium lowercase tracking-eyebrow text-cream/30;
+  }
+
+  .chip-label {
+    @apply font-mono text-[0.65rem] font-medium lowercase tracking-chip;
+  }
+
+  /* Separation by surface lift plus an INSET ring — never an outer border,
+     which would shift layout between states (DESIGN_SPEC §1.4). */
+  .surface-card {
+    @apply rounded-card bg-gradient-to-b from-raised2 to-raised;
+    @apply ring-1 ring-inset ring-cream/7;
+  }
+
+  .field {
+    @apply w-full rounded-card bg-raised px-4 py-3 text-cream;
+    @apply ring-1 ring-inset ring-cream/12 placeholder:text-cream/30;
+    @apply transition-shadow focus:outline-none focus:ring-2 focus:ring-accent;
+  }
+
+  .pill {
+    @apply inline-flex items-center justify-center gap-2 rounded-bubble font-semibold;
+    @apply transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98];
+    @apply disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100;
+  }
+
+  .pill-cream {
+    @apply bg-cream text-ink;
+  }
+
+  .pill-ghost {
+    @apply text-cream shadow-ghost hover:shadow-ghost-hi;
+  }
+
+  .pill-quiet {
+    @apply text-cream/45 hover:text-cream;
+  }
+}
+
+/* MapLibre ships a light-mode chrome; pull it down to the dark room. */
+.maplibregl-ctrl-attrib {
+  background: rgb(var(--c-soft) / 0.8) !important;
+  color: rgb(var(--c-cream) / 0.45) !important;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: rgb(var(--c-cream) / 0.6) !important;
+}
+
+.maplibregl-ctrl-attrib-button {
+  filter: invert(1) opacity(0.5);
 }

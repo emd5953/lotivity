@@ -21,7 +21,7 @@ export function NameDob() {
     >
       <div className="space-y-6">
         <div>
-          <label htmlFor="name" className="mb-2 block text-sm font-medium text-muted">
+          <label htmlFor="name" className="eyebrow mb-2.5 block">
             Name
           </label>
           <input
@@ -31,12 +31,12 @@ export function NameDob() {
             value={draft.name}
             onChange={(e) => updateDraft({ name: e.target.value })}
             placeholder="Your name"
-            className="w-full rounded-card border border-line bg-surface px-4 py-3.5 text-[1.05rem] placeholder:text-muted/60"
+            className="field py-3.5 text-[1.05rem]"
           />
         </div>
 
         <div>
-          <label htmlFor="dob" className="mb-2 block text-sm font-medium text-muted">
+          <label htmlFor="dob" className="eyebrow mb-2.5 block">
             Date of birth
           </label>
           <input
@@ -47,19 +47,21 @@ export function NameDob() {
             min="1920-01-01"
             onChange={(e) => updateDraft({ dob: e.target.value })}
             aria-describedby="dob-help"
-            className="w-full rounded-card border border-line bg-surface px-4 py-3.5 text-[1.05rem]"
+            className="field py-3.5 text-[1.05rem]"
           />
-          <p id="dob-help" className="mt-2 text-sm text-muted">
+          <p id="dob-help" className="mt-2.5 text-sm leading-relaxed text-cream/45">
             Never shown to anyone. We use it to work out your generation, which is.
           </p>
         </div>
 
         {generation ? (
-          <div className="rounded-card bg-brand-soft p-4" aria-live="polite">
-            <p className="text-sm text-muted">Others will see</p>
-            <p className="mt-2 flex items-center gap-2">
-              <span className="font-medium">{draft.name.trim() || 'Your name'}</span>
-              <Pill tone="brand">{generationLabel(generation)}</Pill>
+          <div className="surface-card p-4" aria-live="polite">
+            <p className="eyebrow">Others will see</p>
+            <p className="mt-2.5 flex items-center gap-2">
+              <span className="font-display font-semibold tracking-card text-cream">
+                {draft.name.trim() || 'Your name'}
+              </span>
+              <Pill tone="accent">{generationLabel(generation)}</Pill>
             </p>
           </div>
         ) : null}

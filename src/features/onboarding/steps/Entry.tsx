@@ -16,17 +16,20 @@ export function Entry() {
   };
 
   return (
-    <div className="flex flex-1 flex-col justify-between py-10">
+    <div className="flex flex-1 flex-col justify-between gap-12 py-10">
       <div className="pt-12 text-center">
         <div
           aria-hidden="true"
-          className="mx-auto mb-7 flex h-20 w-20 items-center justify-center rounded-[1.6rem] bg-brand text-3xl text-white"
+          className="mx-auto mb-7 flex h-20 w-20 items-center justify-center rounded-[1.6rem] bg-accent text-3xl text-ink"
         >
           ◍
         </div>
-        <h1 className="text-3xl font-semibold tracking-tight">Lotivity</h1>
-        <p className="mt-2 text-muted">Local Activities. At a Price Best for You.</p>
-        <p className="mx-auto mt-8 max-w-[19rem] text-[0.95rem] leading-relaxed text-muted">
+        {/* The wordmark is a brand moment, so it keeps its capital. */}
+        <h1 className="text-[2.375rem] font-semibold leading-none tracking-display text-cream">
+          Lotivity
+        </h1>
+        <p className="eyebrow mt-3.5">Local Activities. At a Price Best for You.</p>
+        <p className="mx-auto mt-8 max-w-[19rem] text-[0.95rem] leading-relaxed text-cream/45">
           Replacing artificial exchanges with real experiences. It&rsquo;s not revolutionary —
           it&rsquo;s real intelligence.
         </p>
@@ -43,7 +46,7 @@ export function Entry() {
         <Button full variant="ghost" onClick={() => navigate('/for-you')}>
           Look around first
         </Button>
-        <p className="pt-1 text-center text-xs text-muted">
+        <p className="mx-auto max-w-[21rem] pt-1 text-center text-xs leading-relaxed text-cream/30">
           Guests can browse everything nearby. Attending, reviewing, and connecting need a profile.
         </p>
       </div>

@@ -26,7 +26,7 @@ export function OnboardingLayout() {
   if (!hydrated) {
     return (
       <div className="app-frame flex items-center justify-center">
-        <p className="text-muted">Loading…</p>
+        <p className="eyebrow">Loading…</p>
       </div>
     );
   }

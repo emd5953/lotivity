@@ -22,7 +22,7 @@ export function AppShell() {
   if (!hydrated) {
     return (
       <div className="app-frame flex items-center justify-center">
-        <p className="text-muted">Loading…</p>
+        <p className="eyebrow">Loading…</p>
       </div>
     );
   }
@@ -35,7 +35,7 @@ export function AppShell() {
 
       <nav
         aria-label="Primary"
-        className="fixed bottom-0 left-1/2 z-30 w-full max-w-app -translate-x-1/2 border-t border-line bg-surface/95 pb-safe-b backdrop-blur"
+        className="fixed bottom-0 left-1/2 z-30 w-full max-w-app -translate-x-1/2 bg-soft/95 pb-safe-b shadow-[inset_0_1px_0_0_rgb(var(--c-cream)/0.09)] backdrop-blur"
       >
         <ul className="flex">
           {TABS.map((tab) => (
@@ -44,8 +44,9 @@ export function AppShell() {
                 to={tab.to}
                 className={({ isActive }) =>
                   [
-                    'flex flex-col items-center gap-0.5 py-2.5 text-[0.7rem] transition-colors',
-                    isActive ? 'text-brand font-medium' : 'text-muted',
+                    'chip-label flex flex-col items-center gap-1 py-2.5 transition-colors duration-150',
+                    // The tab you are on is the live one, so it is the olive one.
+                    isActive ? 'text-accent' : 'text-cream/45 hover:text-cream/60',
                   ].join(' ')
                 }
               >

@@ -18,13 +18,13 @@ export function ComingSoon({
     <>
       <ScreenHeader title={title} trailing={<Pill>{milestone}</Pill>} />
       <Card className="space-y-3">
-        <p className="text-sm leading-relaxed text-muted">{body}</p>
-        <p className="text-sm text-muted">
+        <p className="text-sm leading-relaxed text-cream/85">{body}</p>
+        <p className="text-sm leading-relaxed text-cream/45">
           Not built yet — this MVP covers onboarding, For You, and the map.
         </p>
         <Link
           to="/for-you"
-          className="inline-block text-sm font-medium text-brand underline underline-offset-4"
+          className="inline-block text-sm font-medium text-accent underline underline-offset-4 hover:text-accent-hi"
         >
           Back to For You →
         </Link>

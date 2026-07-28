@@ -39,10 +39,12 @@ export function Rendering() {
     <div className="flex flex-1 flex-col items-center justify-center text-center">
       <div
         aria-hidden="true"
-        className="mb-8 h-16 w-16 animate-spin rounded-full border-2 border-line border-t-brand"
+        className="mb-8 h-16 w-16 animate-spin rounded-full border-2 border-cream/12 border-t-accent"
       />
-      <h1 className="text-xl font-semibold">Rendering your community…</h1>
-      <p className="mt-3 h-5 text-[0.95rem] text-muted" aria-live="polite">
+      <h1 className="text-xl font-semibold tracking-title text-cream">
+        Rendering your community…
+      </h1>
+      <p className="mt-3.5 h-5 text-[0.95rem] text-cream/45" aria-live="polite">
         {LINES[line]}
       </p>
     </div>

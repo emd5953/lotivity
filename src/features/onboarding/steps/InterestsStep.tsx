@@ -63,8 +63,8 @@ export function InterestsStep() {
         </BubbleGroup>
 
         {chosen.length > 0 ? (
-          <div className="space-y-5 border-t border-line pt-6">
-            <p className="text-sm text-muted">
+          <div className="mt-2 space-y-5 pt-6 shadow-[inset_0_1px_0_0_rgb(var(--c-cream)/0.09)]">
+            <p className="text-sm text-cream/45">
               Want to narrow any of these? Optional, but it sharpens your feed.
             </p>
             {chosen.map((id) => {

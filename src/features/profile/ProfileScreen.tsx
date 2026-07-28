@@ -11,7 +11,7 @@ function TagRow({ label, values }: { label: string; values: string[] }) {
   if (values.length === 0) return null;
   return (
     <div>
-      <p className="text-sm font-medium text-muted">{label}</p>
+      <p className="eyebrow">{label}</p>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {values.map((v) => (
           <Pill key={v}>{v}</Pill>
@@ -31,8 +31,10 @@ export function ProfileScreen() {
       <>
         <ScreenHeader title="Profile" subtitle="Browsing as a guest" />
         <Card className="space-y-3">
-          <p className="font-medium">Nothing saved yet</p>
-          <p className="text-sm leading-relaxed text-muted">
+          <p className="font-display text-[1.0625rem] font-semibold tracking-card text-cream">
+            Nothing saved yet
+          </p>
+          <p className="text-sm leading-relaxed text-cream/45">
             Guests can browse everything nearby. Setting up a profile is what gets you matched
             on heritage, faith, and interests — and lets you attend, review, and connect.
           </p>
@@ -60,15 +62,16 @@ export function ProfileScreen() {
       <div className="space-y-4">
         <Card className="space-y-4">
           <div className="flex flex-wrap gap-1.5">
-            <Pill tone="brand">{generationLabel(profile.generation)}</Pill>
-            {profile.isGuest ? <Pill tone="accent">Guest</Pill> : null}
+            <Pill tone="accent">{generationLabel(profile.generation)}</Pill>
+            {profile.isGuest ? <Pill tone="info">Guest</Pill> : null}
             {profile.youthVerification ? (
               <Pill tone="warn">Guardian verification {profile.youthVerification.status}</Pill>
             ) : null}
           </div>
 
           {/* The privacy promise, stated where the user can see it (PRD §8). */}
-          <p className="text-sm leading-relaxed text-muted">
+          {/* The privacy promise is body copy, not fine print (DESIGN_SPEC §4.4). */}
+          <p className="text-sm leading-relaxed text-cream/85">
             Your date of birth is never shown to anyone. Only your generation is.
           </p>
         </Card>
@@ -96,11 +99,11 @@ export function ProfileScreen() {
         </Card>
 
         <Card className="space-y-3">
-          <p className="font-medium">Settings</p>
+          <p className="eyebrow">Settings</p>
           <Button variant="secondary" full onClick={handleReset}>
             Reset demo
           </Button>
-          <p className="text-sm text-muted">
+          <p className="text-sm leading-relaxed text-cream/45">
             Clears your profile and everything stored on this device, then starts onboarding over.
           </p>
         </Card>

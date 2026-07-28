@@ -16,6 +16,11 @@ interface BubbleProps {
 /**
  * The signature interaction of the product. Uses real ARIA states rather than
  * styled buttons so screen readers announce selection correctly (NFR-7).
+ *
+ * Selection is an olive INSET ring plus olive text, not an olive fill
+ * (DESIGN_SPEC §1.4). A filter row that defaults to all-on would otherwise
+ * paint a whole band solid olive, and olive that covers everything has
+ * stopped meaning "alive". Nothing reflows between states either way.
  */
 export function Bubble({
   label,
@@ -35,12 +40,12 @@ export function Bubble({
       disabled={disabled}
       onClick={onToggle}
       className={cx(
-        'inline-flex items-center gap-1.5 rounded-bubble border transition-colors',
-        'disabled:opacity-40 disabled:cursor-not-allowed',
+        'inline-flex items-center gap-1.5 rounded-bubble ring-1 ring-inset',
+        'transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40',
         size === 'sm' ? 'px-3 py-1.5 text-sm' : 'px-4 py-2.5 text-[0.95rem]',
         selected
-          ? 'border-brand bg-brand text-white font-medium'
-          : 'border-line bg-surface text-ink hover:border-brand/40 active:bg-brand-soft',
+          ? 'bg-accent/10 font-medium text-accent ring-accent'
+          : 'bg-raised text-cream/85 ring-cream/12 hover:bg-raised2 hover:text-cream',
       )}
     >
       {label}
@@ -66,10 +71,8 @@ export function BubbleGroup({
 }: BubbleGroupProps) {
   return (
     <fieldset role={multi ? 'group' : 'radiogroup'} aria-label={legend}>
-      <legend className={cx('text-sm font-medium text-muted mb-2', hideLegend && 'sr-only')}>
-        {legend}
-      </legend>
-      {description ? <p className="text-sm text-muted mb-3">{description}</p> : null}
+      <legend className={cx('eyebrow mb-2.5', hideLegend && 'sr-only')}>{legend}</legend>
+      {description ? <p className="mb-3 text-sm text-cream/45">{description}</p> : null}
       <div className="flex flex-wrap gap-2">{children}</div>
     </fieldset>
   );

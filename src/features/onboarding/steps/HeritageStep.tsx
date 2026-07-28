@@ -45,13 +45,13 @@ export function HeritageStep() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search heritage"
           aria-label="Search heritage"
-          className="w-full rounded-card border border-line bg-surface px-4 py-3 placeholder:text-muted/60"
+          className="field"
         />
 
         {matches ? (
           <BubbleGroup legend="Search results">
             {matches.length === 0 ? (
-              <p className="text-sm text-muted">No matches for &ldquo;{query}&rdquo;.</p>
+              <p className="text-sm text-cream/45">No matches for &ldquo;{query}&rdquo;.</p>
             ) : (
               matches.map((h) => (
                 <Bubble
