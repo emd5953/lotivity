@@ -130,4 +130,35 @@ Filterable map: **events · clubs · workshops · food**
 
 ## Status
 
-Concept and product definition. No implementation yet.
+**MVP v0 — a mock Progressive Web App.** Onboarding, For You, and the map are built and working against fixture data. Groups, Social, and the intro sequence are not.
+
+```bash
+npm install
+npm run dev
+```
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server |
+| `npm run build` | Production build (also generates the service worker) |
+| `npm test` | Unit tests |
+| `npm run test:e2e` | Playwright flows |
+| `npm run lint` | ESLint |
+
+### What works
+
+- **Onboarding** — the full profile flow: name and DOB, account type, heritage by continent, languages, faith and community, relationship status, and exactly six interests with subcategories. Persists across reload; a refresh mid-flow resumes in place.
+- **For You** — a ranked feed where every card states why it surfaced, plus the heritage notification card.
+- **Map** — filterable radius map over New York with live counts, a network trail overlay, and a graceful fallback when geolocation is denied.
+- **PWA** — installable, works offline after first load.
+
+### What's mocked
+
+There is no backend. All data is generated from a fixed seed, so the app looks identical on every machine. Google and Apple sign-in resolve instantly to a placeholder identity; nothing authenticates and nothing leaves the device. Venue names are invented — no real business is implied.
+
+Groups, Social, and Work render honest placeholders. The Earth-to-town intro sequence is not built; the app opens on a splash.
+
+### Documentation
+
+- [Product Requirements](docs/PRD.md) — problem, users, business model, priorities, metrics
+- [Technical Requirements](docs/TECHNICAL_REQUIREMENTS.md) — stack, functional requirements, data model, milestones

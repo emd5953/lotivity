@@ -1,0 +1,70 @@
+import { useEffect } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useAppStore } from './store';
+
+const TABS = [
+  { to: '/for-you', label: 'For You', icon: '✦' },
+  { to: '/groups', label: 'Groups', icon: '◎' },
+  { to: '/social', label: 'Social', icon: '❋' },
+  { to: '/map', label: 'Map', icon: '⌖' },
+  { to: '/profile', label: 'Profile', icon: '☺' },
+];
+
+export function AppShell() {
+  const { hydrated, profile, hydrate } = useAppStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!hydrated) void hydrate();
+  }, [hydrated, hydrate]);
+
+  // Anyone without a profile belongs in onboarding, not a half-empty feed.
+  useEffect(() => {
+    if (hydrated && !profile && !location.pathname.startsWith('/welcome')) {
+      navigate('/welcome', { replace: true });
+    }
+  }, [hydrated, profile, location.pathname, navigate]);
+
+  if (!hydrated) {
+    return (
+      <div className="app-frame flex items-center justify-center">
+        <p className="text-muted">Loading…</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app-frame pb-tab-bar">
+      <main className="screen-pad pb-6">
+        <Outlet />
+      </main>
+
+      <nav
+        aria-label="Primary"
+        className="fixed bottom-0 left-1/2 z-30 w-full max-w-app -translate-x-1/2 border-t border-line bg-surface/95 pb-safe-b backdrop-blur"
+      >
+        <ul className="flex">
+          {TABS.map((tab) => (
+            <li key={tab.to} className="flex-1">
+              <NavLink
+                to={tab.to}
+                className={({ isActive }) =>
+                  [
+                    'flex flex-col items-center gap-0.5 py-2.5 text-[0.7rem] transition-colors',
+                    isActive ? 'text-brand font-medium' : 'text-muted',
+                  ].join(' ')
+                }
+              >
+                <span aria-hidden="true" className="text-lg leading-none">
+                  {tab.icon}
+                </span>
+                {tab.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  );
+}

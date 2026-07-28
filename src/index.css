@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm paper canvas, deep green brand — reads as "local/civic", not "tech". */
+    --c-canvas: 250 247 242;
+    --c-surface: 255 255 255;
+    --c-ink: 26 32 30;
+    --c-muted: 106 118 114;
+    --c-line: 226 220 210;
+    --c-brand: 13 92 74;
+    --c-brand-soft: 226 240 235;
+    --c-accent: 232 163 61;
+    --c-warn: 176 62 42;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  /* Visible focus everywhere — the bubble UI is keyboard-heavy (NFR-6). */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-canvas;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .app-frame {
+    @apply mx-auto w-full max-w-app min-h-dvh bg-canvas;
+  }
+
+  .screen-pad {
+    @apply px-5;
+  }
+}
