@@ -10,6 +10,8 @@
 
 This document specifies the technical requirements for **Lotivity v0** — a fully interactive, **mock** Progressive Web App. The goal is a clickable, demo-ready product that renders every core screen and flow described in the [README](../README.md), backed by fixture data rather than a live backend.
 
+Product rationale — why these features, in this order, for these users — lives in the [PRD](./PRD.md). Where the two documents overlap, the PRD is authoritative on *what* and *why*; this document is authoritative on *how*.
+
 ### In scope
 
 - All screens: intro sequence, profile creation, For You, Groups, Social Feed, Map Radius
@@ -166,7 +168,7 @@ interface User {
   accountType: AccountType;
   heritage: ID[];           // → Heritage
   languages: string[];      // BCP-47
-  cultureTags: ID[];        // religion / culture bubbles
+  cultureTags: ID[];        // namespaced: `faith:*` and `community:*` (PRD §9.1)
   relationshipStatus?: string;
   interests: Interest[];    // exactly 6 at signup
   location: GeoPoint;
@@ -351,9 +353,14 @@ v0 ships no backend, but must not foreclose one:
 
 ## 12. Open Questions
 
-1. Which metro area seeds the map — a real city, or a fictional one?
-2. Does the intro sequence use hand-drawn illustration, or generated/vector art?
-3. What is the upvote threshold that triggers sponsorship, and does it scale with radius population?
-4. Should guest profiles reach the full app, or a read-only subset?
-5. Are voice-memo reviews public to the whole radius, or only to the reviewer's network?
-6. Is "Hindi" in the religion/culture bubbles intended as **Hindu**?
+Resolved in [PRD §9](./PRD.md#9-resolved-product-decisions):
+
+- **Map seed** — New York City, real coordinates, fictional venue names (PRD §9.5).
+- **Guest profiles** — full read access, no write (PRD §9.3).
+- **Culture bubbles** — `faith:*` and `community:*` tagged in separate namespaces, presented on one screen; "Hindi" corrected to **Hindu** (PRD §9.1).
+
+Still open — tracked in [PRD §10](./PRD.md#10-open-questions):
+
+1. Does the intro sequence use hand-drawn illustration, or generated/vector art? *(before M3)*
+2. What is the upvote threshold that triggers sponsorship, and does it scale with radius population? *(before M5)*
+3. Are voice-memo reviews public to the whole radius, or only to the reviewer's network? *(before M6)*
