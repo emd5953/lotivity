@@ -1,8 +1,10 @@
 # Lotivity — iOS
 
-The native SwiftUI port of the mock PWA. Same product, same design system, same
-fixture world — see `../docs/PRD.md`, `../docs/TECHNICAL_REQUIREMENTS.md`, and
-`../docs/DESIGN_SPEC.md`, which remain the source of truth for both surfaces.
+The Lotivity app. Same product, same design system, and the same fixture world
+as the React PWA it replaced — see `../docs/PRD.md` and `../docs/DESIGN_SPEC.md`,
+which remain the source of truth. `../docs/TECHNICAL_REQUIREMENTS.md` still holds
+for the functional requirements and the data model; its stack and file-tree
+sections describe the retired web implementation, and this file supersedes them.
 
 ## Layout
 
@@ -18,7 +20,7 @@ ios/
       Fixtures/           deterministic PRNG + the world generator
       Repo/               the only way features read data (BR-1)
       Persistence.swift   JSON-per-key on disk, best-effort
-    Tests/                the vitest suites, ported
+    Tests/                the web app's suites, ported to XCTest
   Lotivity/             the app
     Design/               tokens, the pill system, bubbles, film grain
     Features/             ForYou, Map, Profile, Onboarding, placeholders
@@ -39,16 +41,19 @@ cd ios && xcodebuild -project Lotivity.xcodeproj -scheme Lotivity \
 Minimum iOS 17. Swift language mode 5 — the package and app both opt in
 explicitly rather than inheriting whatever the toolchain defaults to.
 
-## The fixture world is the same world
+## The fixture world is the world the web app shipped
 
 `LotivityKit`'s PRNG is a bit-for-bit port of the JavaScript `mulberry32`, and
-the generator consumes randomness in exactly the same order, so both apps build
-an identical world from the same seed. That is checked, not asserted:
+the generator consumes randomness in exactly the same order, so this app builds
+the identical world the React version did from the same seed. That was checked
+by dumping every field of every record from both and diffing — the dumps were
+identical — and the digests are now pinned in `FingerprintTests`, so any
+reordered `rng` call fails loudly instead of quietly reshuffling the demo.
+
+To see the full text when that test fails:
 
 ```sh
-FINGERPRINT_OUT=/tmp/js.txt npx vitest run src/data/fixtures/fingerprint.test.ts
-cd ios/LotivityKit && FINGERPRINT_OUT=/tmp/swift.txt swift test --filter FingerprintTests
-diff /tmp/js.txt /tmp/swift.txt   # empty
+FINGERPRINT_OUT=/tmp/world.txt swift test --filter FingerprintTests
 ```
 
 ## Deliberate differences from the web app

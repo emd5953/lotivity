@@ -130,33 +130,32 @@ Filterable map: **events · clubs · workshops · food**
 
 ## Status
 
-**MVP v0 — a mock Progressive Web App.** Onboarding, For You, and the map are built and working against fixture data. Groups, Social, and the intro sequence are not.
+**MVP v0 — a native iOS app.** Onboarding, For You, and the map are built and working against fixture data. Groups, Social, and the intro sequence are not.
+
+The app is SwiftUI, iOS 17 and up, in [`ios/`](ios/). It started life as a React PWA; that version was retired once the port was complete and reproduced its generated world byte for byte. It is still in the history if you need it.
 
 ```bash
-npm install
-npm run dev
+open ios/Lotivity.xcodeproj
 ```
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Dev server |
-| `npm run build` | Production build (also generates the service worker) |
-| `npm test` | Unit tests |
-| `npm run test:e2e` | Playwright flows |
-| `npm run lint` | ESLint |
+| `cd ios/LotivityKit && swift test` | Domain-layer tests — no simulator needed |
+| `xcodebuild -project ios/Lotivity.xcodeproj -scheme Lotivity -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` | Build the app |
+
+See [`ios/README.md`](ios/README.md) for the layout and the decisions the port made.
 
 ### What works
 
-- **Onboarding** — the full profile flow: name and DOB, account type, heritage by continent, languages, faith and community, relationship status, and exactly six interests with subcategories. Persists across reload; a refresh mid-flow resumes in place.
+- **Onboarding** — the full profile flow: name and DOB, account type, heritage by continent, languages, faith and community, relationship status, and exactly six interests with subcategories. Persists across launches; quitting mid-flow resumes in place.
 - **For You** — a ranked feed where every card states why it surfaced, plus the heritage notification card.
-- **Map** — filterable radius map over New York with live counts, a network trail overlay, and a graceful fallback when geolocation is denied.
-- **PWA** — installable, works offline after first load.
+- **Map** — filterable radius map over New York with live counts, a network trail overlay, and a graceful fallback when location is denied.
 
 ### What's mocked
 
-There is no backend. All data is generated from a fixed seed, so the app looks identical on every machine. Google and Apple sign-in resolve instantly to a placeholder identity; nothing authenticates and nothing leaves the device. Venue names are invented — no real business is implied.
+There is no backend. All data is generated from a fixed seed, so the app looks identical on every device. Google and Apple sign-in resolve instantly to a placeholder identity; nothing authenticates and nothing leaves the device. Venue names are invented — no real business is implied.
 
-Groups, Social, and Work render honest placeholders. The Earth-to-town intro sequence is not built; the app opens on a splash.
+Groups, Social, and Work render honest placeholders. The Earth-to-town intro sequence is not built; the app opens on the feed.
 
 ### Documentation
 

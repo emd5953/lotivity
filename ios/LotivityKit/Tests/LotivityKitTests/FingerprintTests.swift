@@ -1,10 +1,11 @@
+import CryptoKit
 import XCTest
 @testable import LotivityKit
 
-/// Canonical, order-sensitive dump of the fixture world, matching
-/// `src/data/fixtures/fingerprint.test.ts` line for line. Running both and
-/// diffing is how the claim "the Swift world is the JavaScript world" is
-/// checked rather than assumed.
+/// Canonical, order-sensitive dump of the fixture world: every field of every
+/// record, in generation order. Its digest is pinned below, so any change to the
+/// generator — a reordered `rng` call, an extra `chance()` — fails here loudly
+/// instead of quietly reshuffling the demo.
 func fingerprint(seed: UInt32) -> String {
     let w = generateWorld(seed: seed)
 
@@ -88,12 +89,29 @@ private func formatNumber(_ value: Double) -> String {
 }
 
 final class FingerprintTests: XCTestCase {
-    /// Writes the dump when FINGERPRINT_OUT is set; otherwise just exercises it.
-    func testWritesTheCanonicalDump() throws {
-        let text = "\(fingerprint(seed: 20_260_728))\n---\n\(fingerprint(seed: 42))"
-        if let path = ProcessInfo.processInfo.environment["FINGERPRINT_OUT"] {
-            try text.write(toFile: path, atomically: true, encoding: .utf8)
+    /// These digests were produced by the React app's generator before it was
+    /// retired, and this port reproduces them byte for byte. They are the
+    /// evidence that the world here is the world the web app shipped, not a
+    /// plausible-looking substitute.
+    private let goldenDigests: [UInt32: String] = [
+        20_260_728: "d689de5de08cb8981089e093af5de5c55032d571153d44e429ba4438cdfda450",
+        42: "7c4e93f0de2bc4be34e7f7d354c9074a0346de34d12bc350ab0845ddf80ee257",
+    ]
+
+    func testMatchesTheWorldTheWebAppGenerated() {
+        for (seed, expected) in goldenDigests {
+            XCTAssertEqual(digest(of: fingerprint(seed: seed)), expected, "seed \(seed)")
         }
-        XCTAssertGreaterThan(text.count, 1000)
+    }
+
+    /// Dumps the full text for eyeballing a diff when the digest above fails.
+    func testWritesTheDumpWhenAsked() throws {
+        guard let path = ProcessInfo.processInfo.environment["FINGERPRINT_OUT"] else { return }
+        try "\(fingerprint(seed: 20_260_728))\n---\n\(fingerprint(seed: 42))"
+            .write(toFile: path, atomically: true, encoding: .utf8)
+    }
+
+    private func digest(of text: String) -> String {
+        SHA256.hash(data: Data(text.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 }

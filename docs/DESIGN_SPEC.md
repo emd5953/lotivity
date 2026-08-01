@@ -7,8 +7,8 @@ Lotivity.
 
 A local-activity app you actually leave the house for. It matches people to
 real gatherings in their radius by generation, heritage, faith, and interest,
-and it shows its work on every card. Surfaces: the PWA (React + Vite +
-Tailwind) — onboarding, For You, Groups, Social, Map, Profile.
+and it shows its work on every card. Surfaces: the iOS app (SwiftUI) —
+onboarding, For You, Groups, Social, Map, Profile.
 
 ## THE ONE-LINE DESIGN THESIS
 

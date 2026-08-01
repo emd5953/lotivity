@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Lotivity">
-  <rect width="64" height="64" rx="14" fill="#0d5c4a" />
-  <circle cx="32" cy="36" r="18" fill="none" stroke="#faf7f2" stroke-width="3" />
-  <path d="M14 36h36" stroke="#faf7f2" stroke-width="3" stroke-linecap="round" />
-  <path d="M32 18c6 6 6 30 0 36-6-6-6-30 0-36z" fill="none" stroke="#faf7f2" stroke-width="3" />
-  <path d="M22 16h6v-6h8v6h6" fill="none" stroke="#e8a33d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
-</svg>

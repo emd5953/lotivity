@@ -1,8 +1,14 @@
 # Lotivity — Technical Requirements Document
 
 **Version:** 0.1
-**Status:** Draft
-**Scope:** Mock Progressive Web App (v0)
+**Status:** Draft — partly superseded
+**Scope:** Mock app (v0)
+
+> **Note.** The functional requirements (§4), the data model (§5), the ranking
+> weights (§6), and the business rules still hold and are implemented as written.
+> The stack table (§3), the PWA-specific requirements, and the file tree describe
+> the React implementation, which was retired in favor of a native SwiftUI app.
+> See [`../ios/README.md`](../ios/README.md) for what replaced them.
 
 ---
 

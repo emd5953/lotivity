@@ -1,27 +1,15 @@
-node_modules
-dist
-dist-ssr
-dev-dist
-coverage
-*.local
-*.tsbuildinfo
-
-.env
-.env.*
-!.env.example
-
 .DS_Store
 *.log
-npm-debug.log*
 
+# Swift / Xcode
+.build/
+DerivedData/
+.swiftpm/
+*.xcuserstate
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/
+
+# Editors
 .vscode/*
 !.vscode/extensions.json
 .idea
-
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-ios/LotivityKit/.build/
-ios/*.xcodeproj/project.xcworkspace/
-ios/*.xcodeproj/xcuserdata/
