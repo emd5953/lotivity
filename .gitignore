@@ -13,3 +13,4 @@ DerivedData/
 .vscode/*
 !.vscode/extensions.json
 .idea
+ios/build/

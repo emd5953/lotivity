@@ -27,16 +27,18 @@ ios/
   Lotivity.xcodeproj
 ```
 
-## Build and test
+## Run and test
 
 ```sh
-# domain layer — fast, no simulator
-cd ios/LotivityKit && swift test
+./run.sh                # build, install, and launch on the iPhone 17 Pro simulator
+./run.sh "iPhone Air"   # any name from `xcrun simctl list devices available`
+./run.sh --console      # same, but streams the app's output until ^C
 
-# the app
-cd ios && xcodebuild -project Lotivity.xcodeproj -scheme Lotivity \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+cd LotivityKit && swift test   # domain layer — fast, no simulator
 ```
+
+There is no server to start: the fixture world is generated in-process, so the
+app is fully functional offline and on first launch.
 
 Minimum iOS 17. Swift language mode 5 — the package and app both opt in
 explicitly rather than inheriting whatever the toolchain defaults to.

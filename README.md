@@ -135,13 +135,17 @@ Filterable map: **events · clubs · workshops · food**
 The app is SwiftUI, iOS 17 and up, in [`ios/`](ios/). It started life as a React PWA; that version was retired once the port was complete and reproduced its generated world byte for byte. It is still in the history if you need it.
 
 ```bash
-open ios/Lotivity.xcodeproj
+cd ios && ./run.sh
 ```
 
 | Command | What it does |
 | --- | --- |
+| `ios/run.sh` | Build, install, and launch on a simulator |
+| `ios/run.sh --console` | Same, streaming the app's output |
 | `cd ios/LotivityKit && swift test` | Domain-layer tests — no simulator needed |
-| `xcodebuild -project ios/Lotivity.xcodeproj -scheme Lotivity -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` | Build the app |
+| `open ios/Lotivity.xcodeproj` | Work in Xcode instead |
+
+There's no server to run — the fixture world is generated in-process.
 
 See [`ios/README.md`](ios/README.md) for the layout and the decisions the port made.
 
