@@ -1,20 +1,22 @@
 # Lotivity — Technical Requirements Document
 
-**Version:** 0.1
-**Status:** Draft — partly superseded
-**Scope:** Mock app (v0)
+**Version:** 0.2
+**Status:** Draft
+**Scope:** Mock native iOS app (v0)
+**Last updated:** 2026-07-31
 
-> **Note.** The functional requirements (§4), the data model (§5), the ranking
-> weights (§6), and the business rules still hold and are implemented as written.
-> The stack table (§3), the PWA-specific requirements, and the file tree describe
-> the React implementation, which was retired in favor of a native SwiftUI app.
-> See [`../ios/README.md`](../ios/README.md) for what replaced them.
+> **v0.2 — platform change.** v0.1 specified a React + Vite Progressive Web App,
+> which was built and then retired in favor of a native SwiftUI app. The
+> functional requirements, data model, ranking weights, and business rules are
+> unchanged and carried over intact; §2, §3, §7, §8, and §10 are rewritten for
+> the new platform. The Swift port reproduces the web app's generated world byte
+> for byte, so no fixture behavior changed with the move.
 
 ---
 
 ## 1. Purpose & Scope
 
-This document specifies the technical requirements for **Lotivity v0** — a fully interactive, **mock** Progressive Web App. The goal is a clickable, demo-ready product that renders every core screen and flow described in the [README](../README.md), backed by fixture data rather than a live backend.
+This document specifies the technical requirements for **Lotivity v0** — a fully interactive, **mock** native iOS app. The goal is a clickable, demo-ready product that renders every core screen and flow described in the [README](../README.md), backed by fixture data rather than a live backend.
 
 Product rationale — why these features, in this order, for these users — lives in the [PRD](./PRD.md). Where the two documents overlap, the PRD is authoritative on *what* and *why*; this document is authoritative on *how*.
 
@@ -22,8 +24,8 @@ Product rationale — why these features, in this order, for these users — liv
 
 - All screens: intro sequence, profile creation, For You, Groups, Social Feed, Map Radius
 - Full navigation between them, with realistic seeded content
-- Local persistence so a session survives a reload
-- Installable PWA with offline shell
+- Local persistence so a session survives an app restart
+- Runs entirely offline — no network call at any point
 
 ### Explicitly out of scope for v0
 
@@ -45,10 +47,11 @@ Everything deferred must still be **designed around** — see [§9 Backend Readi
 
 Stated because they were chosen, not specified:
 
-1. **Mobile-first, portrait.** Design target is a 390×844 viewport; the app must remain usable to 1280px wide but is not designed for desktop.
-2. **No real user data.** All profiles, events, businesses, and reviews are fixtures. Nothing leaves the device.
-3. **Single locale.** English only in v0; copy is externalized so localization is additive.
-4. **One seeded metro area.** The map and radius features operate over a single fictional or real city so distances feel plausible.
+1. **iPhone, portrait.** Design target is a 393×852 point screen. iPad runs the same build in a centered column capped at 480 points; landscape is not a design target.
+2. **iOS 17 minimum.** Chosen for `@Observable`, `NavigationStack` paths, and SwiftUI `Map` with content builders — all of which remove adapter code that would otherwise exist only to support older systems.
+3. **No real user data.** All profiles, events, businesses, and reviews are fixtures. Nothing leaves the device.
+4. **Single locale.** English only in v0; copy sits in the views so localization is additive.
+5. **One seeded metro area.** The map and radius features operate over a single real city so distances feel plausible.
 
 ---
 
@@ -56,20 +59,19 @@ Stated because they were chosen, not specified:
 
 | Concern | Choice | Rationale |
 | --- | --- | --- |
-| Framework | React 18 + TypeScript | Largest component ecosystem; types keep fixtures honest |
-| Build / dev server | Vite | Fast HMR; first-class PWA plugin |
-| PWA | `vite-plugin-pwa` (Workbox) | Generates manifest + service worker with minimal config |
-| Routing | React Router (data router) | Nested layouts match the tab structure |
-| Styling | Tailwind CSS + CSS custom properties | Rapid iteration; tokens keep the design system coherent |
-| Animation | Framer Motion | Needed for the intro sequence and tab transitions |
-| Map | MapLibre GL JS + free raster/vector tiles | No API key required for a mock; swappable for Mapbox later |
-| State | Zustand | Minimal boilerplate for profile + session state |
-| Persistence | IndexedDB via `idb-keyval` | Survives reload; larger quota than `localStorage` for audio blobs |
-| Audio | `MediaRecorder` API | Voice-memo reviews record locally |
-| Testing | Vitest + React Testing Library; Playwright for flows | Unit coverage on logic, E2E on the three critical paths |
-| Lint / format | ESLint + Prettier | Enforced in CI |
+| Language | Swift 6 toolchain, language mode 5 | Mode 5 is explicit in both targets rather than inherited; strict concurrency is a later, deliberate migration |
+| UI | SwiftUI, iOS 17+ | Declarative, and the design system is small enough that UIKit buys nothing |
+| Domain layer | A local Swift package, `LotivityKit` | A real module boundary: features cannot reach past `Repo` into fixtures because those symbols are not `public` |
+| State | `@Observable` `AppState` in the environment | One store, no third-party dependency |
+| Navigation | `TabView`-free custom bar + `NavigationStack` path | Tab labels must be mono, lowercase, olive-when-live; onboarding steps are an enum the compiler checks |
+| Map | MapKit | Native, no API key, no tile CDN, no third-party dependency. Radius drawn with `MapCircle` |
+| Location | CoreLocation, one-shot when-in-use | Denial falls back to a seeded center rather than a dead end |
+| Persistence | JSON file per key in Application Support | Survives relaunch; the right shape for voice-memo blobs later |
+| Audio | `AVAudioRecorder` *(not yet built — M6)* | Voice-memo reviews record locally |
+| Testing | XCTest in the package | Runs on the host in under a second, no simulator |
+| Build | `xcodebuild`, or `ios/run.sh` for build → install → launch | |
 
-**Constraint:** no runtime dependency requires an API key, account, or paid tier. The app must run offline after first load with `npm install && npm run dev`.
+**Constraint:** zero third-party dependencies. No runtime dependency requires an API key, account, or paid tier, and the app makes no network request at all — including for map tiles, which MapKit serves through the system.
 
 ---
 
@@ -149,92 +151,102 @@ Requirements are labeled `FR-<area>-<n>`. Each must be demonstrable in the runni
 ### 4.8 Cross-cutting (`FR-APP`)
 
 - **FR-APP-1** — Bottom tab navigation: For You · Groups · Social · Map · Profile. Work is reachable from For You and Profile.
-- **FR-APP-2** — Installable PWA — manifest, icons (192/512/maskable), splash, standalone display.
-- **FR-APP-3** — Offline: app shell and all fixture data load with no network.
-- **FR-APP-4** — All state persists across reload and app restart.
+- **FR-APP-2** — Ships as a normal iOS app: app icon, launch screen, portrait, dark appearance forced (there is no light mode).
+- **FR-APP-3** — Offline: every screen and all fixture data render with no network. The world is generated in-process at launch, not fetched or bundled as JSON.
+- **FR-APP-4** — All state persists across app restart, including a partially-completed onboarding flow.
 - **FR-APP-5** — A **Reset demo** control in Settings clears state and replays the intro.
 
 ---
 
 ## 5. Data Model (fixtures)
 
-TypeScript interfaces, shaped so a future API can return them unchanged.
+Swift types, shaped so a future API can return them unchanged. Abridged from `LotivityKit/Sources/LotivityKit/Schema.swift`, which is authoritative.
 
-```ts
-type ID = string;
+```swift
+typealias ID = String
 
-type Generation = 'alpha' | 'genz' | 'millennial' | 'genx' | 'boomer' | 'silent';
-type AccountType = 'youth' | 'adult' | 'retired';
+enum Generation: String { case alpha, genz, millennial, genx, boomer, silent }
+enum AccountType: String { case youth, adult, retired }
 
-interface User {
-  id: ID;
-  name: string;
-  dob: string;              // ISO date — never exposed to other users
-  generation: Generation;   // derived from dob; the only age signal shown
-  accountType: AccountType;
-  heritage: ID[];           // → Heritage
-  languages: string[];      // BCP-47
-  cultureTags: ID[];        // namespaced: `faith:*` and `community:*` (PRD §9.1)
-  relationshipStatus?: string;
-  interests: Interest[];    // exactly 6 at signup
-  location: GeoPoint;
-  isGuest: boolean;
-  youthVerification?: { status: 'none' | 'pending' | 'verified'; guardianName?: string };
+struct GeoPoint { var lat: Double; var lng: Double }
+
+struct User {
+    var id: ID
+    var name: String
+    var dob: String              // yyyy-MM-dd — never exposed to other users
+    var generation: Generation   // derived from dob; the only age signal shown
+    var accountType: AccountType
+    var heritage: [ID]           // → Heritage
+    var languages: [String]
+    var cultureTags: [ID]        // namespaced: `faith:*` and `community:*` (PRD §9.1)
+    var relationshipStatus: String?
+    var interests: [ID]          // exactly 6 at signup
+    var interestSubcategories: [ID]
+    var location: GeoPoint
+    var isGuest: Bool
+    var youthVerification: YouthVerification?
 }
 
-interface Interest { id: ID; label: string; subcategories: ID[] }
-interface Heritage { id: ID; label: string; continent: Continent; country: string }
-interface GeoPoint { lat: number; lng: number }
+/// What any other user is allowed to see. A distinct type, not `User` with a
+/// nulled field — see BR-5.
+struct PublicUser { /* every field of User except `dob` */ }
 
-interface Business {
-  id: ID; name: string; category: string; location: GeoPoint;
-  valueTags: ID[];          // matched against group requests
-  inNetwork: boolean;       // Lotivity business partner
-  positiveVotes7d: number;
+struct Business {
+    var id: ID; var name: String; var category: String
+    var mapFilter: MapFilter     // `.food` or `.workshops`
+    var location: GeoPoint; var neighborhood: String
+    var valueTags: [ID]          // matched against group requests
+    var inNetwork: Bool          // Lotivity business partner
+    var positiveVotes7d: Int
 }
 
-interface Event {
-  id: ID; title: string; hostId: ID; hostType: 'user' | 'group' | 'business';
-  category: 'sports' | 'paid' | 'volunteer' | 'social' | 'work';
-  location: GeoPoint; venueId?: ID;
-  startsAt: string; endsAt: string;
-  interestTags: ID[]; heritageTags: ID[]; cultureTags: ID[];
-  generationTags: Generation[];
-  attendeeIds: ID[]; interestedIds: ID[];
-  requiresGuardian: boolean;    // true when youth accounts may attend
-  sponsoredBy?: ID;
+struct LotivityEvent {
+    var id: ID; var title: String; var hostId: ID
+    var hostType: HostType       // .user | .group | .business
+    var category: EventCategory  // .sports | .paid | .volunteer | .social | .work
+    var location: GeoPoint; var neighborhood: String; var venueId: ID?
+    var startsAt: Date; var endsAt: Date
+    var interestTags: [ID]; var heritageTags: [ID]; var cultureTags: [ID]
+    var generationTags: [Generation]
+    var attendeeIds: [ID]; var interestedIds: [ID]
+    var requiresGuardian: Bool   // true when youth accounts may attend
+    var sponsoredBy: ID?; var priceLabel: String?
 }
 
-interface Group {
-  id: ID; name: string; category: Event['category'];
-  memberIds: ID[]; radiusMi: number; center: GeoPoint;
-  sponsorship: { state: 'none' | 'pending' | 'sponsored'; businessId?: ID; promoCode?: string };
+struct Group {
+    var id: ID; var name: String; var category: EventCategory
+    var description: String; var memberIds: [ID]
+    var radiusMi: Double; var center: GeoPoint; var neighborhood: String
+    var interestTags: [ID]; var cultureTags: [ID]
+    var sponsorship: Sponsorship // state + businessId? + promoCode?
 }
 
-interface ActivityRequest {
-  id: ID; authorId: ID; description: string;
-  radiusMi: number; center: GeoPoint;
-  targetInterests: ID[]; targetCulture: ID[]; targetGenerations: Generation[];
-  notifiedCount: number;        // simulated
-  upvotes: number; upvoteThreshold: number;
-  resolvedGroupId?: ID;
+struct ActivityRequest {
+    var id: ID; var authorId: ID; var description: String
+    var radiusMi: Double; var center: GeoPoint
+    var targetInterests: [ID]; var targetCulture: [ID]
+    var targetGenerations: [Generation]
+    var notifiedCount: Int       // simulated
+    var upvotes: Int; var upvoteThreshold: Int
+    var resolvedGroupId: ID?
 }
 
-interface Post {
-  id: ID; authorId: ID; eventId?: ID; businessId?: ID;
-  body: string; media: MediaRef[];
-  voiceMemo?: { blobKey: string; durationSec: number; sentiment: 'positive' | 'neutral' | 'negative' };
-  createdAt: string;
-  visibleUntil: string;         // enforces the 7-day event-post window
+struct Post {
+    var id: ID; var authorId: ID; var eventId: ID?; var businessId: ID?
+    var body: String; var media: [MediaRef]; var voiceMemo: VoiceMemo?
+    var createdAt: Date
+    var visibleUntil: Date       // enforces the 7-day event-post window
 }
 
-interface Connection {
-  userId: ID; peerId: ID;
-  origin: 'invite' | 'contacts' | 'shared-event';
-  sharedEventId?: ID;
-  connectedAt: string;
+struct Connection {
+    var userId: ID; var peerId: ID
+    var origin: Origin           // .invite | .contacts | .sharedEvent
+    var sharedEventId: ID?
+    var connectedAt: Date
 }
 ```
+
+Timestamps are `Date` in memory and ISO 8601 on disk and on the wire (BR-3); the JSON coders are configured once in `Persistence.swift`.
 
 ### Seed data volume
 
@@ -276,15 +288,15 @@ Requirements:
 
 | ID | Requirement |
 | --- | --- |
-| NFR-1 | Lighthouse PWA audit passes; Performance ≥ 90 on a simulated mid-tier mobile device |
-| NFR-2 | First Contentful Paint < 1.5 s on a warm cache |
-| NFR-3 | Intro sequence sustains 60 fps on a 2020-or-newer mid-range phone |
-| NFR-4 | Initial JS bundle ≤ 300 KB gzipped, excluding the lazily-loaded map |
-| NFR-5 | Map view code-split and loaded on first navigation to the Map tab |
-| NFR-6 | WCAG 2.1 AA: contrast, focus order, labeled controls, `prefers-reduced-motion` respected |
-| NFR-7 | Fully operable with a screen reader; bubble multi-selects expose proper roles and state |
-| NFR-8 | No crash-on-refresh at any point in the onboarding flow |
-| NFR-9 | Works offline after first load, including the map at previously-viewed zoom levels |
+| NFR-1 | Cold launch to an interactive feed in under 1 s on an iPhone 12 or newer |
+| NFR-2 | Building the fixture world is synchronous and off the critical path — under 50 ms, cached per calendar day |
+| NFR-3 | Intro sequence sustains 60 fps on an iPhone 12 or newer |
+| NFR-4 | Zero third-party runtime dependencies; the app binary carries no vendored framework |
+| NFR-5 | The domain layer is UI-independent — `LotivityKit` imports only `Foundation` and its tests run without a simulator |
+| NFR-6 | Contrast, focus order, labeled controls; Dynamic Type up to XXL without clipping; `accessibilityReduceMotion` respected |
+| NFR-7 | Fully operable with VoiceOver; bubble multi-selects expose selected state, not just a label |
+| NFR-8 | Persistence failure degrades to an in-memory session — losing the profile is acceptable, crashing is not |
+| NFR-9 | Works with the network disabled, including the map, from first launch |
 | NFR-10 | No secrets, keys, or real personal data in the repository |
 
 ---
@@ -292,29 +304,36 @@ Requirements:
 ## 8. Architecture
 
 ```
-src/
-  app/            # routing, layout shells, providers
-  features/
-    intro/        # animated zoom sequence
-    onboarding/   # profile creation steps
-    foryou/
-    groups/       # groups + activity requests
-    work/
-    social/       # feed, recaps, voice memos, network
-    map/          # MapLibre view, filters, radius
-    profile/
-  data/
-    fixtures/     # seed JSON, one file per entity
-    repo/         # repository layer — the future API seam
-    schema/       # shared TypeScript types
-  lib/
-    recommend/    # scoring engine
-    geo/          # distance, radius, bounds
-    audio/        # MediaRecorder wrapper
-  ui/             # design-system primitives (Bubble, Card, Sheet, Tabs)
+ios/
+  LotivityKit/                  # domain layer — a package, not a folder
+    Sources/LotivityKit/
+      Schema.swift              # the types features and the repo agree on
+      Geo.swift                 # distance, radius, bounds, proximity
+      Generation.swift          # DOB → generation, account-type suggestion
+      Recommend.swift           # scoring engine + weights
+      OnboardingDraft.swift     # the in-progress profile, and the guest identity
+      Persistence.swift         # JSON per key, best-effort
+      Reference/                # heritage, culture, interests, NYC
+      Fixtures/                 # RNG, pools, world generator
+      Repo/                     # repository layer — the future API seam
+    Tests/LotivityKitTests/
+  Lotivity/                     # the app
+    LotivityApp.swift
+    AppState.swift              # one @Observable store
+    Design/                     # Theme, Components, FlowLayout
+    Features/
+      Onboarding/Steps/         # one file per question
+      ForYou/
+      Groups/                   # groups + activity requests   (M5, not built)
+      Social/                   # feed, recaps, voice memos     (M6, not built)
+      Map/
+      Profile/
+      Placeholder/
 ```
 
-**The repository layer is the seam.** Every feature reads and writes through `data/repo/*`, which returns Promises and never exposes fixtures directly. Swapping mock for live becomes a change to one directory.
+**The repository layer is the seam.** Every feature reads through `Repo`, which is `async`, returns domain types, and never exposes fixtures directly. Swapping mock for live is a change to one directory.
+
+**The package boundary enforces it.** `LotivityKit` is a separate module, so anything not marked `public` is invisible to the app target. `generateWorld` and the fixture pools are internal — a view *cannot* reach past the repo to the seed data, which in the web version was only a convention.
 
 ---
 
@@ -322,38 +341,43 @@ src/
 
 v0 ships no backend, but must not foreclose one:
 
-- **BR-1** — Repository functions are async and typed exactly as a future API would return.
+- **BR-1** — Repository functions are `async` and typed exactly as a future API would return.
 - **BR-2** — Entity IDs are opaque strings, never array indices.
-- **BR-3** — All timestamps are ISO 8601 UTC.
-- **BR-4** — Geospatial queries are isolated in `lib/geo` so they can move to PostGIS unchanged in behavior.
-- **BR-5** — Privacy rules (DOB hidden, radius-gated connections, 7-day post visibility) are enforced in the repository layer, not in components — so they survive the migration to a real server.
+- **BR-3** — All timestamps serialize as ISO 8601 UTC.
+- **BR-4** — Geospatial queries are isolated in `Geo.swift` so they can move to PostGIS unchanged in behavior.
+- **BR-5** — Privacy rules (DOB hidden, radius-gated connections, 7-day post visibility) are enforced in the repository layer, not in views — so they survive the migration to a real server. DOB is enforced by the type system: `PublicUser` has no such field, so exposing one does not compile.
+- **BR-6** — Ordering is total. Every sort carries an id tiebreak, so results do not depend on the incidental stability of a sort implementation — the same query returns the same order on a server as it does here.
 
 ---
 
 ## 10. Testing
 
-| Level | Coverage |
-| --- | --- |
-| Unit (Vitest) | Recommendation scoring, generation derivation, geo/radius math, promo-code generation, post-visibility windows |
-| Component (RTL) | Bubble multi-select behavior, the 6-interest gate, back-navigation without data loss |
-| E2E (Playwright) | **(a)** intro → full onboarding → For You; **(b)** create radius request → upvote past threshold → sponsored with promo code; **(c)** map radius + filter change updates pins and count |
-| Manual | Install-to-home-screen on iOS Safari and Android Chrome; offline reload; reduced-motion intro |
+| Level | Coverage | Status |
+| --- | --- | --- |
+| Unit (XCTest, in the package) | Recommendation scoring factor by factor, ranking order and tiebreaks, generation boundaries, geo/radius math, map-item filtering, post-visibility windows, fixture volumes and scheduling sanity | 52 tests, green |
+| Fixture integrity | A canonical dump of every field of every record, pinned by digest — any reordered `rng` call fails loudly instead of silently reshuffling the demo | Green; digests carried over from the retired web app |
+| UI (XCUITest) | The 6-interest gate, back-navigation without data loss, radius change updates pins and count | **Not written.** The gap in the suite |
+| Manual | Onboarding end to end; location denied; airplane mode; VoiceOver pass; Dynamic Type at XXL | Partially exercised |
+
+The web version's Playwright flows were not ported. Two of the three covered surfaces that do not exist yet (M5 sponsorship); the third — onboarding through to the feed — is worth rebuilding as XCUITest before M8.
 
 ---
 
 ## 11. Milestones
 
-| # | Deliverable | Exit criteria |
-| --- | --- | --- |
-| M0 | Project scaffold | Vite + TS + Tailwind + PWA manifest; installs and runs offline |
-| M1 | Design system + fixtures | UI primitives built; seed data at target volume, types enforced |
-| M2 | Onboarding | FR-PROF-1 → 14 complete and persistent |
-| M3 | Intro sequence | FR-INTRO-1 → 7, hitting NFR-3 |
-| M4 | For You + recommendation engine | FR-FEED and FR-REC complete with unit tests |
-| M5 | Groups, requests, sponsorship | FR-GROUP and FR-WORK complete |
-| M6 | Social feed + voice memos | FR-SOCIAL complete, including the 7-day window |
-| M7 | Map radius | FR-MAP complete, code-split |
-| M8 | Polish + audit | All NFRs met; E2E suite green; demo script written |
+| # | Deliverable | Exit criteria | Status |
+| --- | --- | --- | --- |
+| M0 | Project scaffold | Xcode project + `LotivityKit` package; builds and runs offline | ✅ |
+| M1 | Design system + fixtures | UI primitives built; seed data at target volume | ✅ |
+| M2 | Onboarding | FR-PROF-1 → 14 complete and persistent | ✅ |
+| M3 | Intro sequence | FR-INTRO-1 → 7, hitting NFR-3 | ⬜ Deferred (PRD P2) |
+| M4 | For You + recommendation engine | FR-FEED and FR-REC complete with unit tests | ✅ |
+| M5 | Groups, requests, sponsorship | FR-GROUP and FR-WORK complete | ⬜ Data model done, no UI |
+| M6 | Social feed + voice memos | FR-SOCIAL complete, including the 7-day window | ⬜ 7-day rule enforced in the repo; no UI |
+| M7 | Map radius | FR-MAP complete | ✅ |
+| M8 | Polish + audit | All NFRs met; UI suite green; demo script written | ⬜ |
+
+M5 is the one open **P0** item (PRD §6) — the sponsorship loop is the differentiated mechanic and the only priority-zero feature without a surface.
 
 ---
 
@@ -370,3 +394,10 @@ Still open — tracked in [PRD §10](./PRD.md#10-open-questions):
 1. Does the intro sequence use hand-drawn illustration, or generated/vector art? *(before M3)*
 2. What is the upvote threshold that triggers sponsorship, and does it scale with radius population? *(before M5)*
 3. Are voice-memo reviews public to the whole radius, or only to the reviewer's network? *(before M6)*
+
+Provisional answers are already encoded in the fixtures — thresholds of 25/40/50 that do not scale with population, and self-declared business value tags. They are demo defaults, not decisions, and M5 should not ship on them without a deliberate call.
+
+Opened by the platform change:
+
+4. Does the domain layer migrate to Swift 6 strict concurrency, and when? Both targets pin language mode 5 today. Nothing in the design fights it — the world is immutable once built and the one cache is lock-guarded — but it is unmigrated work, not free.
+5. Does anything need to run on the web again (a shareable event link, a business portal)? If so, `LotivityKit` is the part that would need a second implementation, and the fingerprint digests are how a port would be verified.

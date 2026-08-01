@@ -435,7 +435,7 @@ public struct World: Sendable {
 }
 
 /// Builds the entire fixture world. Deterministic for a given seed.
-public func generateWorld(seed: UInt32 = fixtureSeed) -> World {
+func generateWorld(seed: UInt32 = fixtureSeed) -> World {
     let rng = RNG(seed: seed)
     let users = makeUsers(rng)
     let businesses = makeBusinesses(rng)
