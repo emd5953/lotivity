@@ -18,6 +18,12 @@ export default {
         teal: 'rgb(var(--c-teal) / <alpha-value>)',
         error: 'rgb(var(--c-error) / <alpha-value>)',
         success: 'rgb(var(--c-success) / <alpha-value>)',
+        // Categorical encoding only — map pins, club categories. No orange.
+        sand: 'rgb(var(--c-sand) / <alpha-value>)',
+        plum: 'rgb(var(--c-plum) / <alpha-value>)',
+        slate: 'rgb(var(--c-slate) / <alpha-value>)',
+        moss: 'rgb(var(--c-moss) / <alpha-value>)',
+        clay: 'rgb(var(--c-clay) / <alpha-value>)',
       },
       fontFamily: {
         // Display is tight and packed; body is plain; chrome is mono.
@@ -49,6 +55,17 @@ export default {
         // Ghost pills ring on the INSIDE so their size never shifts.
         ghost: 'inset 0 0 0 1px rgb(var(--c-cream) / 0.22)',
         'ghost-hi': 'inset 0 0 0 1px rgb(var(--c-cream) / 0.45)',
+      },
+      // Card entrance, 0.25s ease-out (DESIGN_SPEC §3.3). Not a loop —
+      // and prefers-reduced-motion flattens it globally in src/index.css.
+      keyframes: {
+        enter: {
+          from: { opacity: '0', transform: 'translateY(6px)' },
+          to: { opacity: '1', transform: 'none' },
+        },
+      },
+      animation: {
+        enter: 'enter 0.25s ease-out both',
       },
       borderRadius: {
         bubble: '999px',

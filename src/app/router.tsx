@@ -4,6 +4,7 @@ import { AppShell } from './AppShell';
 import { ForYouScreen } from '@/features/foryou/ForYouScreen';
 import { ProfileScreen } from '@/features/profile/ProfileScreen';
 import { ComingSoon } from '@/features/placeholder/ComingSoon';
+import { LandingScreen } from '@/features/landing/LandingScreen';
 import { OnboardingLayout } from '@/features/onboarding/OnboardingLayout';
 import { onboardingRoutes } from '@/features/onboarding/routes';
 
@@ -18,6 +19,9 @@ const MapFallback = (
 );
 
 export const router = createBrowserRouter([
+  // Marketing entry. `/` still opens straight into the feed — the landing
+  // page is where people arrive from outside, not a wall in front of the app.
+  { path: '/landing', element: <LandingScreen /> },
   {
     path: '/welcome',
     element: <OnboardingLayout />,
