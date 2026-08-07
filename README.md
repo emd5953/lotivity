@@ -8,7 +8,7 @@
 
 ## What It Is
 
-Lotivity connects people to real-world activities, clubs, and events happening in their radius — matched to their generation, heritage, interests, and stage of life. Businesses in the network sponsor the gatherings that align with their values, and users earn discounts by contributing honest voice-memo reviews and profile posts.
+Lotivity connects people to real-world community, activities, clubs, and events happening in their radius — matched to their generation, heritage, interests, and stage of life. Businesses in the network sponsor the gatherings that align with their values, and users earn discounts by contributing honest voice-memo reviews and profile posts.
 
 ## Core Concepts
 
